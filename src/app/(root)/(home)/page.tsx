@@ -126,7 +126,7 @@ const HomePage = () => {
 
   return (
     <section className="flex max-w-full flex-col gap-10 text-white">
-      <h1 className="text-3xl font-semibold text-center">
+      <h1 className="text-2xl md:text-3xl font-semibold text-center">
         {returnedLink ? "Share Your Secret" : "Create a Secret"}
       </h1>
       {returnedLink ? (
@@ -140,9 +140,9 @@ const HomePage = () => {
           onValueChange={(value: string) => {
             setCurrentTab(value as inputType);
           }}
-          className="max-w-[700px] w-full h-fit min-w-max bg-dark-1 border border-slate-500 rounded-lg mx-auto mt-10 px-6"
+          className="max-w-[700px] w-full h-fit min-w-fit bg-dark-1 border border-slate-500 rounded-lg mx-auto mt-10 md:px-6"
         >
-          <TabsList className="flex gap-7 bg-transparent h-14">
+          <TabsList className="flex gap-7 bg-transparent h-14 p-2">
             <TabsTrigger value="text" disabled={isLoading}>
               Text
             </TabsTrigger>

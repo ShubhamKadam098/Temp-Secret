@@ -34,7 +34,7 @@ const ShowMessage = ({
   };
 
   return (
-    <div className="flex flex-col p-5 bg-dark-1 border border-slate-500 rounded-lg min-h-32 gap-6 min-w-64 lg:min-w-[600px] max-w-[600px]">
+    <div className="flex flex-wrap flex-col gap-8 border border-slate-400 rounded-lg bg-dark-1 px-4 py-8 w-full">
       <h1 className="border-b border-slate-500 pb-2 font-semibold text-base">
         Your Secret
       </h1>
@@ -58,13 +58,13 @@ const ShowMessage = ({
           <>
             <Button
               variant={"secondary"}
-              className="w-[30%] flex items-center gap-2 bg-blue-500 hover:bg-blue-700 text-white"
+              className="mx-auto flex items-center gap-2 bg-blue-500 hover:bg-blue-700 text-white w-fit "
               onClick={() => {
                 navigator.clipboard.writeText(message);
                 toast.success("Copied to clipboard");
               }}
             >
-              <Clipboard width={"15px"} height={"15px"} />
+              <Clipboard width={20} height={20} className="hidden md:block" />
               Copy
             </Button>
           </>
