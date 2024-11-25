@@ -34,8 +34,8 @@ const ShowMessage = ({
   };
 
   return (
-    <div className="flex flex-wrap flex-col gap-8 border border-slate-400 rounded-lg bg-dark-1 px-4 py-8 w-full">
-      <h1 className="border-b border-slate-500 pb-2 font-semibold text-base">
+    <div className="flex flex-wrap flex-col gap-8 border border-border rounded-lg bg-card px-4 py-8 w-full">
+      <h1 className="border-b border-border pb-2 font-semibold text-base">
         Your Secret
       </h1>
       {inputType == "file" ? (
@@ -47,8 +47,8 @@ const ShowMessage = ({
       <div className="flex justify-center">
         {inputType === "file" ? (
           <Button
-            variant={"secondary"}
-            className="w-fit flex items-center justify-center gap-2 bg-green-500 hover:bg-green-700 text-white text-sx"
+            variant="default"
+            className="w-fit flex items-center justify-center gap-2"
             onClick={downloadFile}
           >
             <Download width={"15px"} height={"15px"} />
@@ -57,8 +57,8 @@ const ShowMessage = ({
         ) : (
           <>
             <Button
-              variant={"secondary"}
-              className="mx-auto flex items-center gap-2 bg-blue-500 hover:bg-blue-700 text-white w-fit "
+              variant="default"
+              className="mx-auto flex items-center gap-2 w-fit"
               onClick={() => {
                 navigator.clipboard.writeText(message);
                 toast.success("Copied to clipboard");

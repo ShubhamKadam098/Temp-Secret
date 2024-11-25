@@ -19,8 +19,8 @@ const SecretsPage = ({ params }: { params: { id: string } }) => {
   } = useFetchMessage(params.id);
 
   return (
-    <section className="text-white flex mx-auto justify-center min-h-36 p-4 min-w-fit ">
-      <div className="flex  gap-6 flex-col  rounded-lg  shadow-lg w-full md:min-w-[500px] lg:w-auto">
+    <section className="text-foreground flex mx-auto justify-center min-h-36 p-4 min-w-fit ">
+      <div className="flex  gap-6 flex-col  rounded-lg   w-full md:min-w-[500px] lg:w-auto">
         <h1 className="text-xl md:text-2xl font-bold">Knock Knock</h1>
         <h4 className="font-semibold text-sm md:text-base">
           You have received a secret
@@ -28,7 +28,7 @@ const SecretsPage = ({ params }: { params: { id: string } }) => {
         {isMessageAvailable ? (
           <>
             {isPasswordRequired ? (
-              <div className=" flex flex-wrap items-center gap-8  border border-slate-400 rounded-lg bg-dark-1 px-4 py-8 ">
+              <div className=" flex flex-wrap items-center gap-8  border border-border rounded-lg bg-card px-4 py-8 ">
                 <h1 className="text-sm md:text-base">Password is required</h1>
                 <Input
                   type="password"
@@ -41,7 +41,7 @@ const SecretsPage = ({ params }: { params: { id: string } }) => {
                 {isLoading ? (
                   <Button
                     disabled
-                    className="border-rose-600 border bg-red-600 text-white flex items-center justify-center w-[90%] mx-auto"
+                    className="bg-destructive text-destructive-foreground flex items-center justify-center w-[90%] mx-auto"
                   >
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Please wait
@@ -49,7 +49,8 @@ const SecretsPage = ({ params }: { params: { id: string } }) => {
                 ) : (
                   <Button
                     disabled={isLoading}
-                    className="flex gap-3 bg-red-700 hover:bg-red-800 w-[90%] max-w-full focus:outline-none focus:border hover:border focus:border-white  hover:border-white mx-auto"
+                    variant="destructive"
+                    className="flex gap-3 w-[90%] max-w-full focus:ring-2 focus:ring-offset-2 mx-auto"
                     onClick={fetchMessage}
                   >
                     <Unlock
@@ -66,7 +67,7 @@ const SecretsPage = ({ params }: { params: { id: string } }) => {
                 {message ? (
                   <ShowMessage inputType={inputType} message={message} />
                 ) : (
-                  <div className="flex flex-wrap items-center gap-8 md:gap4 border border-slate-400 rounded-lg bg-dark-1 px-4 py-8 ">
+                  <div className="flex flex-wrap items-center gap-8 md:gap4 border border-border rounded-lg bg-card px-4 py-8 ">
                     <p className="text-sm md:text-base">
                       Be aware! The following secret can only be revealed one
                       time.
@@ -74,17 +75,16 @@ const SecretsPage = ({ params }: { params: { id: string } }) => {
                     {isLoading ? (
                       <Button
                         disabled={isLoading}
-                        variant={"destructive"}
-                        className=" bg-red-800 rounded-md border border-slate-400  flex gap-2 hover:border hover:border-white focus:border-2 focus:border-white px-20"
+                        variant="destructive"
+                        className="flex gap-2 focus:ring-2 focus:ring-offset-2 px-20"
                       >
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       </Button>
                     ) : (
                       <Button
                         disabled={isLoading}
-                        variant={"destructive"}
-                        className="px-5 bg-red-800 rounded-md border border-slate-400  flex gap-2 hover:border hover:border-white focus:border-2 focus:border-white
-                        mx-auto break-words whitespace-normal h-fit"
+                        variant="destructive"
+                        className="px-5 flex gap-2 mx-auto break-words whitespace-normal h-fit focus:ring-2 focus:ring-offset-2"
                         onClick={fetchMessage}
                       >
                         <Unlock

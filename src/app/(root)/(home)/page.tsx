@@ -125,7 +125,7 @@ const HomePage = () => {
   };
 
   return (
-    <section className="flex max-w-full flex-col gap-10 text-white">
+    <section className="flex max-w-full flex-col gap-10 text-primary">
       <h1 className="text-2xl md:text-3xl font-semibold text-center">
         {returnedLink ? "Share Your Secret" : "Create a Secret"}
       </h1>
@@ -140,7 +140,7 @@ const HomePage = () => {
           onValueChange={(value: string) => {
             setCurrentTab(value as inputType);
           }}
-          className="max-w-[700px] w-full h-fit min-w-fit bg-dark-1 border border-slate-500 rounded-lg mx-auto mt-10 md:px-6"
+          className="max-w-[700px] w-full h-fit min-w-fit bg-background border border-border rounded-lg mx-auto mt-10 md:px-6"
         >
           <TabsList className="flex gap-7 bg-transparent h-14 p-2">
             <TabsTrigger value="text" disabled={isLoading}>
@@ -153,12 +153,12 @@ const HomePage = () => {
               Redirect
             </TabsTrigger>
           </TabsList>
-          <div className="border-b border-slate-500 min-h-[20px] px-10 pb-6">
+          <div className="border-b border-border min-h-[20px] px-10 pb-6">
             <TabsContent value="text">
               <h5 className="text-sm font-semibold mb-4">Message</h5>
               <Textarea
                 placeholder="Hello World"
-                className="border-slate-400"
+                className="border-border text-foreground"
                 disabled={isLoading}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
@@ -178,11 +178,11 @@ const HomePage = () => {
                       onChange={(e) => {
                         if (e.target.files?.[0]) setFile(e.target.files[0]);
                       }}
-                      className="block w-full text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm  file:bg-slate-200 hover:file:bg-slate-300 border border-slate-500 rounded-lg file:rounded-lg file:font-semibold"
+                      className="block w-full text-sm text-primary file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:bg-secondary hover:file:bg-secondary-hover border border-border rounded-lg file:rounded-lg file:font-semibold"
                     />
                     {file ? (
                       <X
-                        className="cursor-pointer rounded-full transition-all ease-in-out hover:bg-slate-400"
+                        className="cursor-pointer rounded-full transition-all ease-in-out hover:bg-secondary-hover"
                         onClick={() => {
                           if (isLoading) return;
                           setFile(undefined);
@@ -195,7 +195,7 @@ const HomePage = () => {
                       ""
                     )}
                   </div>
-                  <p className="text-sm text-slate-400 pl-2">
+                  <p className="text-sm text-muted-foreground pl-2">
                     Supports: .png, .jpg, .jpeg, .pdf (Max 5MB)
                   </p>
                 </div>
@@ -206,7 +206,7 @@ const HomePage = () => {
               <h5 className="text-sm font-semibold mb-4">Link</h5>
               <Input
                 type="url"
-                className="border-slate-400 w-full"
+                className="border-border w-full"
                 placeholder="https://example.com"
                 disabled={isLoading}
                 value={link}
@@ -221,7 +221,7 @@ const HomePage = () => {
                 <AccordionTrigger disabled={isLoading}>
                   More Options
                 </AccordionTrigger>
-                <AccordionContent className="border-b border-slate-500 mb-4">
+                <AccordionContent className="border-b border-border mb-4">
                   <div className="grid w-full items-center gap-4">
                     <Label htmlFor="password">Password</Label>
                     <Input
@@ -230,13 +230,13 @@ const HomePage = () => {
                       placeholder="********"
                       value={password}
                       disabled={isLoading}
-                      className="border-slate-400"
+                      className="border-border"
                       onChange={(e) => setPassword(e.target.value)}
                     />
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="terms2"
-                        className="border border-slate-500 focus:border focus:border-white"
+                        className="border border-border focus:border focus:border-primary"
                         checked={isShowPassword}
                         disabled={isLoading}
                         onClick={() => setIsShowPassword(!isShowPassword)}
@@ -264,7 +264,7 @@ const HomePage = () => {
               <Button
                 variant={"secondary"}
                 onClick={handleSubmit}
-                className="focus:border-white focus:border-2 focus:bg-slate-300"
+                className="focus:border-primary focus:border-2 focus:bg-secondary-hover"
               >
                 Create Secret
               </Button>
