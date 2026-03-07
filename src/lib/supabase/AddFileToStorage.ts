@@ -6,6 +6,13 @@ interface UploadResponse {
   error?: string;
 }
 
+const sanitizeFileName = (name: string): string => {
+  return name
+    .replace(/[^a-zA-Z0-9.-]/g, "_")
+    .replace(/_+/g, "_")
+    .substring(0, 100);
+};
+
 export const AddFileToStorage = async ({
   input,
   id,
@@ -18,7 +25,8 @@ export const AddFileToStorage = async ({
       throw new Error("No file provided");
     }
 
-    const filePath = `files/${id}/${input.name}`;
+    const sanitizedName = sanitizeFileName(input.name);
+    const filePath = `files/${id}/${sanitizedName}`;
 
     const { data, error } = await supabase.storage
       .from("files")
