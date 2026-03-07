@@ -1,18 +1,18 @@
 import crypto from "crypto";
+import { env } from "@/env";
 
 const EncryptData = async ({ input }: { input: string }) => {
   try {
     const algorithm = "aes-256-cbc";
-    const key = process.env.ENCRYPTION_KEY;
+    const key = env.ENCRYPTION_KEY;
 
-    // Ensure the key is 32 bytes
-    if (!key || key.length !== 32) {
+    if (!key || key.length < 32) {
       console.log("Encryption key must be 32 bytes (256 bits) long");
       throw new Error("Encryption key must be 32 bytes (256 bits) long");
     }
 
     const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
+    const cipher = crypto.createCipheriv(algorithm, Buffer.from(key.slice(0, 32)), iv);
     let encryptData = cipher.update(input, "utf-8", "hex");
     encryptData += cipher.final("hex");
 

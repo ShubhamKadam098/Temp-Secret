@@ -1,18 +1,19 @@
 import crypto from "crypto";
+import { env } from "@/env";
 
 const DecryptData = async ({ iv, input }: { iv: string; input: string }) => {
   try {
     const algorithm = "aes-256-cbc";
-    const key = process.env.ENCRYPTION_KEY;
+    const key = env.ENCRYPTION_KEY;
 
-    if (!key || key.length !== 32) {
+    if (!key || key.length < 32) {
       throw new Error("Encryption key must be 32 bytes (256 bits) long");
     }
 
     const ivBuffer = Buffer.from(iv, "base64");
     const decipher = crypto.createDecipheriv(
       algorithm,
-      Buffer.from(key),
+      Buffer.from(key.slice(0, 32)),
       ivBuffer
     );
     let decryptedData = decipher.update(input, "hex", "utf-8");

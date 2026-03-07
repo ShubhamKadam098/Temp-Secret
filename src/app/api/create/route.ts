@@ -5,6 +5,7 @@ import { addDocPayload } from "@/types/AddDocPayload";
 import EncryptData from "@/lib/EncryptData";
 import generateRandomId from "@/lib/GenerateRandomId";
 import { AddFileToStorage } from "@/lib/firebase/AddFileToStorage";
+import { env } from "@/env";
 
 const MAX_FILE_SIZE_MB = 5;
 const ALLOWED_MIME_TYPES = [
@@ -113,7 +114,7 @@ export const POST = async (request: NextRequest) => {
       {
         success: true,
         message: "Link created successfully",
-        link: `${process.env.NEXT_PUBLIC_BASE_URL}/secret/${id}`,
+        link: `${env.NEXT_PUBLIC_BASE_URL}/secret/${id}`,
       },
       { status: 200 }
     );
