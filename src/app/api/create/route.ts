@@ -1,10 +1,10 @@
-import AddDoc from "@/lib/firebase/AddDoc";
+import AddDoc from "@/lib/supabase/AddDoc";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { addDocPayload } from "@/types/AddDocPayload";
 import EncryptData from "@/lib/EncryptData";
 import generateRandomId from "@/lib/GenerateRandomId";
-import { AddFileToStorage } from "@/lib/firebase/AddFileToStorage";
+import { AddFileToStorage } from "@/lib/supabase/AddFileToStorage";
 import { env } from "@/env";
 
 const MAX_FILE_SIZE_MB = 5;

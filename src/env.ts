@@ -20,3 +20,5 @@ export const env = createEnv({
 });
 
 export const ENCRYPTION_KEY = env.ENCRYPTION_KEY;
+export const NEXT_PUBLIC_SUPABASE_URL = env.NEXT_PUBLIC_SUPABASE_URL;
+export const NEXT_PUBLIC_SUPABASE_ANON_KEY = env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

@@ -1,8 +1,8 @@
-import DeleteDoc from "@/lib/firebase/DeleteDoc";
-import FetchDoc from "@/lib/firebase/FetchDoc";
+import DeleteDoc from "@/lib/supabase/DeleteDoc";
+import FetchDoc from "@/lib/supabase/FetchDoc";
 import bcrypt from "bcryptjs";
 import DecryptData from "@/lib/DecryptData";
-import DeleteStorageFolder from "@/lib/firebase/DeleteStorageFolder";
+import DeleteStorageFolder from "@/lib/supabase/DeleteStorageFolder";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (request: NextRequest) => {
