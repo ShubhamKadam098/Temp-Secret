@@ -7,7 +7,7 @@ import generateRandomId from "@/lib/GenerateRandomId";
 import { AddFileToStorage } from "@/lib/supabase/AddFileToStorage";
 import { env } from "@/env";
 
-const MAX_FILE_SIZE_MB = 5;
+const MAX_FILE_SIZE_MB = 2;
 const ALLOWED_MIME_TYPES = [
   "image/jpeg",
   "image/png",
@@ -36,6 +36,10 @@ export const POST = async (request: NextRequest) => {
         { status: 400 }
       );
     }
+
+    let filePath: string | undefined;
+    let encryptedData: string | undefined;
+    let iv: string | undefined;
 
     if (inputType === "file") {
       if (!(input instanceof File)) {
@@ -68,25 +72,17 @@ export const POST = async (request: NextRequest) => {
       }
 
       const uploadResponse = await AddFileToStorage({ input, id });
-      if (!uploadResponse.success || !uploadResponse.url) {
+      if (!uploadResponse.success || !uploadResponse.filePath) {
         return NextResponse.json(
           { success: false, message: "Error while uploading file" },
           { status: 500 }
         );
       }
 
-      input = uploadResponse.url;
-    }
-
-    // Hash the password if provided
-    if (password) {
-      password = await bcrypt.hash(password, 10);
-    }
-
-    // Encrypt the input if it's a string
-    let encryptedData: string | undefined;
-    let iv: string | undefined;
-    if (typeof input === "string") {
+      filePath = uploadResponse.filePath;
+      encryptedData = filePath;
+    } else if (typeof input === "string") {
+      // Encrypt the input if it's text or link
       const encryptionResult = await EncryptData({ input });
       encryptedData = encryptionResult?.encryptData;
       iv = encryptionResult?.iv;
@@ -97,12 +93,18 @@ export const POST = async (request: NextRequest) => {
       }
     }
 
+    // Hash the password if provided
+    if (password) {
+      password = await bcrypt.hash(password, 10);
+    }
+
     const payLoad: addDocPayload = {
       inputType,
       iv: iv as string,
       input: encryptedData as string,
       isVisited: false,
       password,
+      filePath,
     };
 
     const response = await AddDoc({ id, payLoad });

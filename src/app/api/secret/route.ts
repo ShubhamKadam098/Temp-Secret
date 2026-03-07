@@ -1,5 +1,6 @@
 import DeleteDoc from "@/lib/supabase/DeleteDoc";
 import FetchDoc from "@/lib/supabase/FetchDoc";
+import { FetchFileFromStorage } from "@/lib/supabase/FetchFileFromStorage";
 import bcrypt from "bcryptjs";
 import DecryptData from "@/lib/DecryptData";
 import DeleteStorageFolder from "@/lib/supabase/DeleteStorageFolder";
@@ -53,16 +54,46 @@ export const POST = async (request: NextRequest) => {
       }
     }
 
-    // Decrypt the message
+    let responseData: string;
+    let contentType: string | undefined;
+    let fileName: string | undefined;
+
+    // Handle file type - fetch from storage and convert to base64
+    if (message.inputType === "file" && message.filePath) {
+      const fileResult = await FetchFileFromStorage({
+        filePath: message.filePath,
+      });
+
+      if (!fileResult.success || !fileResult.data) {
+        return NextResponse.json(
+          { success: false, message: "Error fetching file" },
+          { status: 500 }
+        );
+      }
+
+      // Return file data as base64 with metadata
+      await DeleteStorageFolder(id);
+      await DeleteDoc({ docId: id });
+
+      return NextResponse.json(
+        {
+          success: true,
+          inputType: message.inputType,
+          message: fileResult.data,
+          contentType: fileResult.contentType,
+          fileName: fileResult.fileName,
+        },
+        { status: 200 }
+      );
+    }
+
+    // Handle text/link - decrypt normally
     const decryptedMessage = await DecryptData({
       iv: message.iv,
       input: message.input,
     });
 
     // Delete the message after it is viewed
-    if (message.inputType === "file") {
-      // await DeleteStorageFolder(id);
-    }
     await DeleteDoc({ docId: id });
 
     // Respond with the decrypted message

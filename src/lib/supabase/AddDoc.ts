@@ -16,6 +16,7 @@ const AddDoc = async ({
       input: payLoad.input,
       is_visited: payLoad.isVisited,
       password: payLoad.password,
+      file_path: payLoad.filePath,
     });
 
     if (error) throw error;

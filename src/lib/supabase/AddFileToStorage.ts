@@ -2,7 +2,7 @@ import { supabase } from "@/Supabase/config";
 
 interface UploadResponse {
   success: boolean;
-  url?: string;
+  filePath?: string;
   error?: string;
 }
 
@@ -29,11 +29,7 @@ export const AddFileToStorage = async ({
 
     if (error) throw error;
 
-    const { data: urlData } = supabase.storage
-      .from("files")
-      .getPublicUrl(filePath);
-
-    return { success: true, url: urlData.publicUrl };
+    return { success: true, filePath };
   } catch (error: any) {
     console.error("Error uploading file:", error);
     return { success: false, error: error.message };

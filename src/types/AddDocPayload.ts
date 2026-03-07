@@ -4,4 +4,5 @@ export interface addDocPayload {
   input: string;
   isVisited: boolean;
   password: string;
+  filePath?: string;
 }

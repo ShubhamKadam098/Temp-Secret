@@ -17,6 +17,7 @@ const FetchDoc = async ({ docId }: { docId: string }) => {
         input: data.input,
         isVisited: data.is_visited,
         password: data.password,
+        filePath: data.file_path,
       };
     }
     return null;
