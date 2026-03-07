@@ -1,20 +1,25 @@
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
+import Redis from "ioredis";
+import { RateLimiterRedis } from "rate-limiter-flexible";
 import { env } from "@/env";
-import type { Duration } from "@upstash/ratelimit";
 
-export const redis = new Redis({
-  url: env.UPSTASH_REDIS_REST_URL,
-  token: env.UPSTASH_REDIS_REST_TOKEN,
-});
+const redisOptions = {
+  host: env.REDIS_HOST,
+  port: env.REDIS_PORT,
+  password: env.REDIS_PASSWORD,
+  enableOfflineQueue: false,
+};
 
-export const createRatelimit = (requests: number, window: Duration) => {
-  return new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(requests, window),
+export const redis = new Redis(redisOptions);
+
+export const createRatelimit = (requests: number, windowMs: number) => {
+  return new RateLimiterRedis({
+    storeClient: redis,
+    keyPrefix: "ratelimit",
+    points: requests,
+    duration: windowMs / 1000,
   });
 };
 
-export const publicRateLimit = createRatelimit(10, "60 s");
+export const publicRateLimit = createRatelimit(10, 60 * 1000);
 
-export const secretViewRateLimit = createRatelimit(30, "60 s");
+export const secretViewRateLimit = createRatelimit(30, 60 * 1000);

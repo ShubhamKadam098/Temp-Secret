@@ -10,9 +10,9 @@ import { secretViewRateLimit } from "@/lib/rateLimit";
 export const POST = async (request: NextRequest) => {
   try {
     const ip = request.headers.get("x-forwarded-for") || "anonymous";
-    const { success } = await secretViewRateLimit.limit(ip);
-    
-    if (!success) {
+    try {
+      await secretViewRateLimit.consume(ip);
+    } catch {
       return NextResponse.json(
         { success: false, message: "Too many requests. Please try again later." },
         { status: 429 }
