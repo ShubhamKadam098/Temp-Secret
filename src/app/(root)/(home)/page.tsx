@@ -13,11 +13,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import axios from "axios";
 import DisplayLink from "@/components/DisplayLink";
 import toast from "react-hot-toast";
 import { inputType } from "@/types/inputTypes";
 import validateURL from "@/lib/ValidateURL";
+import { useCreateSecret } from "@/hooks/useSecret";
 
 const MAX_FILE_SIZE_MB = 5;
 const ALLOWED_FILE_TYPES = [
@@ -28,7 +28,6 @@ const ALLOWED_FILE_TYPES = [
 ];
 
 const HomePage = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const [text, setText] = useState("");
   const [link, setLink] = useState("");
   const [file, setFile] = useState<File | undefined>();
@@ -38,8 +37,9 @@ const HomePage = () => {
   const [returnedLink, setReturnedLink] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = async () => {
-    setIsLoading(true);
+  const { mutate: createSecret, isPending: isLoading } = useCreateSecret();
+
+  const handleSubmit = () => {
     let value;
 
     switch (currentTab) {
@@ -49,7 +49,6 @@ const HomePage = () => {
       case "link":
         if (!validateURL(link)) {
           toast.error("Please provide valid URL");
-          setIsLoading(false);
           return;
         }
         value = link;
@@ -60,68 +59,42 @@ const HomePage = () => {
 
     if (!value) {
       toast.error("Please enter a value");
-      setIsLoading(false);
       return;
     }
 
     if (currentTab === "file" && value instanceof File) {
-      // Validate file size
       if (value.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
         toast.error("File size exceeds 5MB");
-        setIsLoading(false);
         return;
       }
 
-      // Validate file type
       if (!ALLOWED_FILE_TYPES.includes(value.type)) {
         toast.error("Invalid file type. Only images and PDFs are allowed");
-        setIsLoading(false);
         return;
       }
     }
 
-    const formData = new FormData();
-    formData.append("inputType", currentTab);
-    if (currentTab === "file" && value instanceof File) {
-      formData.append("file", value);
-    } else {
-      formData.append("input", value as string);
-    }
-    formData.append("password", password);
-
-    const createLink = async () => {
-      try {
-        const res = await axios.post("/api/create", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        if (!res.data.success) {
-          throw new Error("Error while creating link");
-        }
-        return res.data.link;
-      } catch (error) {
-        toast.error("Error while creating link");
-        setIsLoading(false);
-        return null;
+    createSecret(
+      {
+        inputType: currentTab,
+        input: value,
+        password: password || undefined,
+      },
+      {
+        onSuccess: (data) => {
+          if (data.success && data.link) {
+            setReturnedLink(data.link);
+            setText("");
+            setLink("");
+            setFile(undefined);
+            setPassword("");
+          }
+        },
+        onError: () => {
+          toast.error("Error while creating link");
+        },
       }
-    };
-
-    const responseLink = await toast.promise(createLink(), {
-      loading: "Creating link...",
-      success: "Link created successfully!",
-      error: "Could not create link.",
-    });
-
-    if (responseLink) {
-      setReturnedLink(responseLink);
-    }
-
-    setText("");
-    setLink("");
-    setFile(undefined);
-    setPassword("");
-    setIsLoading(false);
+    );
   };
 
   return (

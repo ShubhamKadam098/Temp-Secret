@@ -1,24 +1,55 @@
 "use client";
+import { useState } from "react";
 import NoMessageFound from "@/components/NoMessageFound";
 import ShowMessage from "@/components/ShowMessage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, ShieldAlert, Unlock } from "lucide-react";
-import useFetchMessage from "@/hooks/useFetchMessage";
+import { Loader2, Unlock } from "lucide-react";
+import { useFetchSecret } from "@/hooks/useSecret";
+import { AxiosError } from "axios";
+import toast from "react-hot-toast";
 
 const SecretsPage = ({ params }: { params: { id: string } }) => {
-  const {
-    password,
-    setPassword,
-    message,
-    inputType,
-    contentType,
-    fileName,
-    isMessageAvailable,
-    isPasswordRequired,
-    isLoading,
-    fetchMessage,
-  } = useFetchMessage(params.id);
+  const [password, setPassword] = useState("");
+  const [isPasswordRequired, setIsPasswordRequired] = useState(false);
+  const [isMessageAvailable, setIsMessageAvailable] = useState(true);
+
+  const { mutate: fetchMessage, isPending: isLoading, data, reset } = useFetchSecret({ id: params.id });
+
+  const handleFetchMessage = () => {
+    reset();
+    setIsPasswordRequired(false);
+    setIsMessageAvailable(true);
+
+    fetchMessage(password, {
+      onSuccess: (data) => {
+        toast.success("Message retrieved successfully!");
+      },
+      onError: (error) => {
+        if (error instanceof AxiosError) {
+          const { status } = error.response || {};
+          if (status === 401) {
+            setIsPasswordRequired(true);
+            toast.error("Password required");
+          } else if (status === 403) {
+            toast.error("Incorrect password");
+          } else if (status === 404) {
+            setIsMessageAvailable(false);
+            toast.error("Message not found");
+          } else {
+            toast.error("An error occurred while retrieving the message");
+          }
+        } else {
+          toast.error("An error occurred while retrieving the message");
+        }
+      },
+    });
+  };
+
+  const message = data?.message || "";
+  const inputType = data?.inputType || "text";
+  const contentType = data?.contentType || "";
+  const fileName = data?.fileName || "";
 
   return (
     <section className="text-foreground flex mx-auto justify-center min-h-36 p-4 min-w-fit ">
@@ -53,7 +84,7 @@ const SecretsPage = ({ params }: { params: { id: string } }) => {
                     disabled={isLoading}
                     variant="destructive"
                     className="flex gap-3 w-[90%] max-w-full focus:ring-2 focus:ring-offset-2 mx-auto"
-                    onClick={fetchMessage}
+                    onClick={handleFetchMessage}
                   >
                     <Unlock
                       width={20}
@@ -87,7 +118,7 @@ const SecretsPage = ({ params }: { params: { id: string } }) => {
                         disabled={isLoading}
                         variant="destructive"
                         className="px-5 flex gap-2 mx-auto break-words whitespace-normal h-fit focus:ring-2 focus:ring-offset-2"
-                        onClick={fetchMessage}
+                        onClick={handleFetchMessage}
                       >
                         <Unlock
                           width={20}

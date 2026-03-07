@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { GeistSans } from "geist/font/sans";
 import { Toaster } from "react-hot-toast";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 
 export const metadata: Metadata = {
   title: "Temp Secrets",
@@ -18,7 +19,9 @@ export default function RootLayout({
       <body
         className={`${GeistSans.className} bg-background overflow-x-hidden`}
       >
-        {children}
+        <QueryProvider>
+          {children}
+        </QueryProvider>
         <Toaster position="bottom-right" />
       </body>
     </html>
