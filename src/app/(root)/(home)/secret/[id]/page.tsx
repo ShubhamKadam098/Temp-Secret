@@ -8,21 +8,30 @@ import { Loader2, Unlock } from "lucide-react";
 import { useFetchSecret } from "@/hooks/useSecret";
 import { AxiosError } from "axios";
 import toast from "react-hot-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, Form, FormField, FormControl, FormMessage } from "@/components/ui/form";
+import { fetchSecretSchema, FetchSecretFormData } from "@/types/schemas";
 
 const SecretsPage = ({ params }: { params: { id: string } }) => {
-  const [password, setPassword] = useState("");
   const [isPasswordRequired, setIsPasswordRequired] = useState(false);
   const [isMessageAvailable, setIsMessageAvailable] = useState(true);
 
   const { mutate: fetchMessage, isPending: isLoading, data, reset } = useFetchSecret({ id: params.id });
 
-  const handleFetchMessage = () => {
+  const form = useForm<FetchSecretFormData>({
+    resolver: zodResolver(fetchSecretSchema),
+    defaultValues: {
+      password: "",
+    },
+  });
+
+  const handleFetchMessage = (data: FetchSecretFormData) => {
     reset();
     setIsPasswordRequired(false);
     setIsMessageAvailable(true);
 
-    fetchMessage(password, {
-      onSuccess: (data) => {
+    fetchMessage(data.password, {
+      onSuccess: () => {
         toast.success("Message retrieved successfully!");
       },
       onError: (error) => {
@@ -61,40 +70,53 @@ const SecretsPage = ({ params }: { params: { id: string } }) => {
         {isMessageAvailable ? (
           <>
             {isPasswordRequired ? (
-              <div className=" flex flex-wrap items-center gap-8  border border-border rounded-lg bg-card px-4 py-8 ">
-                <h1 className="text-sm md:text-base">Password is required</h1>
-                <Input
-                  type="password"
-                  placeholder="Enter password"
-                  disabled={isLoading}
-                  value={password}
-                  className="w-[90%] mx-auto"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                {isLoading ? (
-                  <Button
-                    disabled
-                    className="bg-destructive text-destructive-foreground flex items-center justify-center w-[90%] mx-auto"
-                  >
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Please wait
-                  </Button>
-                ) : (
-                  <Button
-                    disabled={isLoading}
-                    variant="destructive"
-                    className="flex gap-3 w-[90%] max-w-full focus:ring-2 focus:ring-offset-2 mx-auto"
-                    onClick={handleFetchMessage}
-                  >
-                    <Unlock
-                      width={20}
-                      height={20}
-                      className="hidden md:block"
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleFetchMessage)}>
+                  <div className=" flex flex-wrap items-center gap-8  border border-border rounded-lg bg-card px-4 py-8 ">
+                    <h1 className="text-sm md:text-base">Password is required</h1>
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <div className="w-[90%] mx-auto">
+                          <FormControl>
+                            <Input
+                              type="password"
+                              placeholder="Enter password"
+                              disabled={isLoading}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </div>
+                      )}
                     />
-                    Reveal Secret
-                  </Button>
-                )}
-              </div>
+                    {isLoading ? (
+                      <Button
+                        disabled
+                        className="bg-destructive text-destructive-foreground flex items-center justify-center w-[90%] mx-auto"
+                      >
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Please wait
+                      </Button>
+                    ) : (
+                      <Button
+                        type="submit"
+                        disabled={isLoading}
+                        variant="destructive"
+                        className="flex gap-3 w-[90%] max-w-full focus:ring-2 focus:ring-offset-2 mx-auto"
+                      >
+                        <Unlock
+                          width={20}
+                          height={20}
+                          className="hidden md:block"
+                        />
+                        Reveal Secret
+                      </Button>
+                    )}
+                  </div>
+                </form>
+              </Form>
             ) : (
               <>
                 {message ? (
@@ -118,7 +140,7 @@ const SecretsPage = ({ params }: { params: { id: string } }) => {
                         disabled={isLoading}
                         variant="destructive"
                         className="px-5 flex gap-2 mx-auto break-words whitespace-normal h-fit focus:ring-2 focus:ring-offset-2"
-                        onClick={handleFetchMessage}
+                        onClick={() => handleFetchMessage({ password: "" })}
                       >
                         <Unlock
                           width={20}
