@@ -1,32 +1,26 @@
 import { z } from "zod";
 
-const linkSchema = z.string().refine(
-  (val) => !val || val.startsWith("http"),
-  { message: "URL must start with http:// or https://" }
-).optional().or(z.literal(""));
-
-export const createSecretSchema = z.object({
-  inputType: z.enum(["text", "file", "link"]),
-  text: z.string().max(10000, "Message too long").optional(),
-  link: linkSchema,
-  file: z.instanceof(File).optional(),
-  password: z.string().max(100, "Password too long").optional(),
-}).refine(
-  (data) => {
-    if (data.inputType === "text") return !!data.text?.trim();
-    if (data.inputType === "link") return !!data.link?.trim();
-    if (data.inputType === "file") return !!data.file;
-    return false;
-  },
-  {
-    message: "Value is required",
-    path: ["text"],
-  }
-);
-
 export const fetchSecretSchema = z.object({
   password: z.string().optional(),
 });
 
-export type CreateSecretFormData = z.infer<typeof createSecretSchema>;
 export type FetchSecretFormData = z.infer<typeof fetchSecretSchema>;
+
+export const textSecretSchema = z.object({
+  text: z.string().min(1, "Message is required").max(10000, "Message too long"),
+  password: z.string().max(100, "Password too long").optional(),
+});
+
+export const linkSecretSchema = z.object({
+  link: z.string().min(1, "Link is required").url("Invalid URL"),
+  password: z.string().max(100, "Password too long").optional(),
+});
+
+export const fileSecretSchema = z.object({
+  file: z.instanceof(File, { message: "File is required" }),
+  password: z.string().max(100, "Password too long").optional(),
+});
+
+export type TextSecretFormData = z.infer<typeof textSecretSchema>;
+export type LinkSecretFormData = z.infer<typeof linkSecretSchema>;
+export type FileSecretFormData = z.infer<typeof fileSecretSchema>;

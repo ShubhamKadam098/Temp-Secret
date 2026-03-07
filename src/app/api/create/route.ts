@@ -1,13 +1,13 @@
 import AddDoc from "@/lib/supabase/AddDoc";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { addDocPayload } from "@/types/AddDocPayload";
+import { AddSecretPayload } from "@/types/api";
+import { inputType } from "@/types/inputTypes";
 import EncryptData from "@/lib/EncryptData";
 import generateRandomId from "@/lib/GenerateRandomId";
 import { AddFileToStorage } from "@/lib/supabase/AddFileToStorage";
 import { env } from "@/env";
 import { publicRateLimit } from "@/lib/rateLimit";
-import { RateLimiterRes } from "rate-limiter-flexible";
 
 const MAX_FILE_SIZE_MB = 2;
 const ALLOWED_MIME_TYPES = [
@@ -30,7 +30,7 @@ export const POST = async (request: NextRequest) => {
     }
 
     const formData = await request.formData();
-    const inputType = formData.get("inputType") as string;
+    const inputType = formData.get("inputType") as inputType;
     let input: string | File | null = null;
 
     if (inputType === "file") {
@@ -50,7 +50,8 @@ export const POST = async (request: NextRequest) => {
     }
 
     let filePath: string | undefined;
-    let encryptedData: string | undefined;
+    let contentType: string | undefined;
+    let encryptedContent: string | undefined;
     let iv: string | undefined;
 
     if (inputType === "file") {
@@ -61,7 +62,6 @@ export const POST = async (request: NextRequest) => {
         );
       }
 
-      // Validate file size
       if (input.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
         return NextResponse.json(
           {
@@ -72,7 +72,6 @@ export const POST = async (request: NextRequest) => {
         );
       }
 
-      // Validate file type
       if (!ALLOWED_MIME_TYPES.includes(input.type)) {
         return NextResponse.json(
           {
@@ -92,31 +91,29 @@ export const POST = async (request: NextRequest) => {
       }
 
       filePath = uploadResponse.filePath;
-      encryptedData = filePath;
+      contentType = input.type;
     } else if (typeof input === "string") {
-      // Encrypt the input if it's text or link
       const encryptionResult = await EncryptData({ input });
-      encryptedData = encryptionResult?.encryptData;
+      encryptedContent = encryptionResult?.encryptData;
       iv = encryptionResult?.iv;
 
-      if (!encryptedData || !iv) {
+      if (!encryptedContent || !iv) {
         console.error("Error while encrypting data");
         throw new Error("Error while creating link");
       }
     }
 
-    // Hash the password if provided
     if (password) {
       password = await bcrypt.hash(password, 10);
     }
 
-    const payLoad: addDocPayload = {
+    const payLoad: AddSecretPayload = {
       inputType,
-      iv: iv as string,
-      input: encryptedData as string,
-      isVisited: false,
-      password,
+      encryptedContent: encryptedContent || undefined,
+      iv: iv || undefined,
       filePath,
+      contentType,
+      password: password || undefined,
     };
 
     const response = await AddDoc({ id, payLoad });

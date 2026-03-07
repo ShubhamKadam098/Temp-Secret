@@ -1,6 +1,7 @@
 import { supabase } from "@/Supabase/config";
+import { Secret } from "@/types/api";
 
-const FetchDoc = async ({ docId }: { docId: string }) => {
+const FetchDoc = async ({ docId }: { docId: string }): Promise<Secret | null> => {
   try {
     const { data, error } = await supabase
       .from("secrets")
@@ -12,12 +13,14 @@ const FetchDoc = async ({ docId }: { docId: string }) => {
 
     if (data) {
       return {
+        id: data.id,
         inputType: data.input_type,
+        encryptedContent: data.encrypted_content,
         iv: data.iv,
-        input: data.input,
-        isVisited: data.is_visited,
-        password: data.password,
         filePath: data.file_path,
+        contentType: data.content_type,
+        password: data.password,
+        createdAt: data.created_at,
       };
     }
     return null;

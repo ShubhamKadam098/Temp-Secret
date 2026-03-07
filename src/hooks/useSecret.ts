@@ -1,7 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
-import { fetchSecret, createSecret } from "@/lib/api/secret";
+import { fetchSecret } from "@/lib/api/secret";
 import { inputType } from "@/types/inputTypes";
-import { CreateSecretRequest } from "@/types/api";
 
 export interface FetchSecretState {
   message: string;
@@ -50,11 +49,5 @@ export function useFetchSecret({ id }: UseFetchSecretOptions) {
       };
     },
     throwOnError: false,
-  });
-}
-
-export function useCreateSecret() {
-  return useMutation<{ success: boolean; link?: string }, Error, CreateSecretRequest>({
-    mutationFn: createSecret,
   });
 }

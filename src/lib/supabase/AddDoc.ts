@@ -1,22 +1,22 @@
 import { supabase } from "@/Supabase/config";
-import { addDocPayload } from "@/types/AddDocPayload";
+import { AddSecretPayload } from "@/types/api";
 
 const AddDoc = async ({
   id,
   payLoad,
 }: {
   id: string;
-  payLoad: addDocPayload;
+  payLoad: AddSecretPayload;
 }) => {
   try {
     const { error } = await supabase.from("secrets").insert({
       id,
       input_type: payLoad.inputType,
-      iv: payLoad.iv,
-      input: payLoad.input,
-      is_visited: payLoad.isVisited,
-      password: payLoad.password,
-      file_path: payLoad.filePath,
+      encrypted_content: payLoad.encryptedContent || null,
+      iv: payLoad.iv || null,
+      file_path: payLoad.filePath || null,
+      content_type: payLoad.contentType || null,
+      password: payLoad.password || null,
     });
 
     if (error) throw error;

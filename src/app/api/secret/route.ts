@@ -21,7 +21,6 @@ export const POST = async (request: NextRequest) => {
 
     const { id, password } = await request.json();
 
-    // Validate input
     if (!id) {
       return NextResponse.json(
         { success: false, message: "ID is required" },
@@ -29,7 +28,6 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    // Fetch the document from the database  
     const message = await FetchDoc({ docId: id });
     if (!message) {
       return NextResponse.json(
@@ -38,16 +36,6 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    // Check if the message has already been visited
-    if (message.isVisited) {
-      await DeleteDoc({ docId: id });
-      return NextResponse.json(
-        { success: false, message: "Message not found" },
-        { status: 404 }
-      );
-    }
-
-    // Validate password if required
     if (message.password) {
       if (!password) {
         return NextResponse.json(
@@ -65,11 +53,6 @@ export const POST = async (request: NextRequest) => {
       }
     }
 
-    let responseData: string;
-    let contentType: string | undefined;
-    let fileName: string | undefined;
-
-    // Handle file type - fetch from storage and convert to base64
     if (message.inputType === "file" && message.filePath) {
       const fileResult = await FetchFileFromStorage({
         filePath: message.filePath,
@@ -82,7 +65,6 @@ export const POST = async (request: NextRequest) => {
         );
       }
 
-      // Return file data as base64 with metadata
       await DeleteStorageFolder(id);
       await DeleteDoc({ docId: id });
 
@@ -98,16 +80,20 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    // Handle text/link - decrypt normally
+    if (!message.encryptedContent || !message.iv) {
+      return NextResponse.json(
+        { success: false, message: "Invalid secret data" },
+        { status: 500 }
+      );
+    }
+
     const decryptedMessage = await DecryptData({
       iv: message.iv,
-      input: message.input,
+      input: message.encryptedContent,
     });
 
-    // Delete the message after it is viewed
     await DeleteDoc({ docId: id });
 
-    // Respond with the decrypted message
     return NextResponse.json(
       {
         success: true,

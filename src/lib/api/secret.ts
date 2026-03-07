@@ -17,26 +17,47 @@ export const fetchSecret = async ({
   return res.data;
 };
 
-export const createSecret = async (
-  data: CreateSecretRequest
+export const createSecretText = async (
+  input: string,
+  password?: string
 ): Promise<CreateSecretResponse> => {
   const formData = new FormData();
-  formData.append("inputType", data.inputType);
-
-  if (data.inputType === "file" && data.input instanceof File) {
-    formData.append("file", data.input);
-  } else {
-    formData.append("input", data.input as string);
-  }
-
-  if (data.password) {
-    formData.append("password", data.password);
-  }
+  formData.append("inputType", "text");
+  formData.append("input", input);
+  if (password) formData.append("password", password);
 
   const res = await axios.post<CreateSecretResponse>("/api/create", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return res.data;
+};
+
+export const createSecretLink = async (
+  input: string,
+  password?: string
+): Promise<CreateSecretResponse> => {
+  const formData = new FormData();
+  formData.append("inputType", "link");
+  formData.append("input", input);
+  if (password) formData.append("password", password);
+
+  const res = await axios.post<CreateSecretResponse>("/api/create", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return res.data;
+};
+
+export const createSecretFile = async (
+  input: File,
+  password?: string
+): Promise<CreateSecretResponse> => {
+  const formData = new FormData();
+  formData.append("inputType", "file");
+  formData.append("file", input);
+  if (password) formData.append("password", password);
+
+  const res = await axios.post<CreateSecretResponse>("/api/create", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data;
 };
