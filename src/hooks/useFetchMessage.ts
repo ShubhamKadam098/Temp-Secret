@@ -7,6 +7,8 @@ const useFetchMessage = (id: string) => {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [inputType, setInputType] = useState("text");
+  const [contentType, setContentType] = useState("");
+  const [fileName, setFileName] = useState("");
   const [isMessageAvailable, setIsMessageAvailable] = useState(true);
   const [isPasswordRequired, setIsPasswordRequired] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,6 +39,12 @@ const useFetchMessage = (id: string) => {
       }
       setMessage(res.data.message);
       setInputType(res.data.inputType);
+      if (res.data.contentType) {
+        setContentType(res.data.contentType);
+      }
+      if (res.data.fileName) {
+        setFileName(res.data.fileName);
+      }
       setIsPasswordRequired(false);
       toast.success("Message retrieved successfully!");
     } catch (err: any) {
@@ -64,6 +72,8 @@ const useFetchMessage = (id: string) => {
     setPassword,
     message,
     inputType,
+    contentType,
+    fileName,
     isMessageAvailable,
     isPasswordRequired,
     isLoading,

@@ -12,6 +12,8 @@ const SecretsPage = ({ params }: { params: { id: string } }) => {
     setPassword,
     message,
     inputType,
+    contentType,
+    fileName,
     isMessageAvailable,
     isPasswordRequired,
     isLoading,
@@ -65,7 +67,7 @@ const SecretsPage = ({ params }: { params: { id: string } }) => {
             ) : (
               <>
                 {message ? (
-                  <ShowMessage inputType={inputType} message={message} />
+                  <ShowMessage inputType={inputType} message={message} contentType={contentType} fileName={fileName} />
                 ) : (
                   <div className="flex flex-wrap items-center gap-8 md:gap4 border border-border rounded-lg bg-card px-4 py-8 ">
                     <p className="text-sm md:text-base">

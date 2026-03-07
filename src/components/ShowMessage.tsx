@@ -7,26 +7,50 @@ import { saveAs } from "file-saver";
 const ShowMessage = ({
   inputType,
   message,
+  contentType,
+  fileName,
 }: {
   inputType: string;
   message: string;
+  contentType?: string;
+  fileName?: string;
 }) => {
-  const downloadFile = async () => {
+  const downloadFile = () => {
     if (inputType !== "file" || !message) return;
     try {
-      const response = await fetch(message);
-      if (!response.ok) throw new Error("Network response was not ok");
+      // Check if message is base64 (new approach) or URL (old approach)
+      const isBase64 = message.length > 200 && !message.startsWith("http");
 
-      const blob = await response.blob();
-
-      const url = new URL(message);
-
-      // Extract filename from URL
-      const filename =
-        url.pathname.split("/").pop()?.split("?")[0] || "downloaded_file";
-
-      saveAs(blob, filename);
-      toast.success("Download successful");
+      if (isBase64) {
+        // New approach: message is base64 data
+        const byteCharacters = atob(message);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: contentType || "application/octet-stream" });
+        saveAs(blob, fileName || "downloaded_file");
+        toast.success("Download successful");
+      } else {
+        // Old approach: message is a URL
+        fetch(message)
+          .then((response) => {
+            if (!response.ok) throw new Error("Network response was not ok");
+            return response.blob();
+          })
+          .then((blob) => {
+            const url = new URL(message);
+            const filename =
+              url.pathname.split("/").pop()?.split("?")[0] || "downloaded_file";
+            saveAs(blob, filename);
+            toast.success("Download successful");
+          })
+          .catch((error) => {
+            console.error(error);
+            toast.error("Download failed");
+          });
+      }
     } catch (error) {
       console.error(error);
       toast.error("Download failed");
