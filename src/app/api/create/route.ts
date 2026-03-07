@@ -6,6 +6,7 @@ import EncryptData from "@/lib/EncryptData";
 import generateRandomId from "@/lib/GenerateRandomId";
 import { AddFileToStorage } from "@/lib/supabase/AddFileToStorage";
 import { env } from "@/env";
+import { publicRateLimit } from "@/lib/rateLimit";
 
 const MAX_FILE_SIZE_MB = 2;
 const ALLOWED_MIME_TYPES = [
@@ -17,6 +18,16 @@ const ALLOWED_MIME_TYPES = [
 
 export const POST = async (request: NextRequest) => {
   try {
+    const ip = request.headers.get("x-forwarded-for") || "anonymous";
+    const { success } = await publicRateLimit.limit(ip);
+    
+    if (!success) {
+      return NextResponse.json(
+        { success: false, message: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const formData = await request.formData();
     const inputType = formData.get("inputType") as string;
     let input: string | File | null = null;

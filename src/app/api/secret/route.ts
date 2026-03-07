@@ -5,9 +5,20 @@ import bcrypt from "bcryptjs";
 import DecryptData from "@/lib/DecryptData";
 import DeleteStorageFolder from "@/lib/supabase/DeleteStorageFolder";
 import { NextRequest, NextResponse } from "next/server";
+import { secretViewRateLimit } from "@/lib/rateLimit";
 
 export const POST = async (request: NextRequest) => {
   try {
+    const ip = request.headers.get("x-forwarded-for") || "anonymous";
+    const { success } = await secretViewRateLimit.limit(ip);
+    
+    if (!success) {
+      return NextResponse.json(
+        { success: false, message: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const { id, password } = await request.json();
 
     // Validate input
