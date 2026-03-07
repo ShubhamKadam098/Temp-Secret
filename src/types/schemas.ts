@@ -1,9 +1,14 @@
 import { z } from "zod";
 
+const linkSchema = z.string().refine(
+  (val) => !val || val.startsWith("http"),
+  { message: "URL must start with http:// or https://" }
+).optional().or(z.literal(""));
+
 export const createSecretSchema = z.object({
   inputType: z.enum(["text", "file", "link"]),
   text: z.string().max(10000, "Message too long").optional(),
-  link: z.string().url("Invalid URL").optional(),
+  link: linkSchema,
   file: z.instanceof(File).optional(),
   password: z.string().max(100, "Password too long").optional(),
 }).refine(

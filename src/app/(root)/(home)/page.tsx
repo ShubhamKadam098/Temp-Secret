@@ -115,7 +115,17 @@ const HomePage = () => {
         />
       ) : (
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit, (errors) => {
+              console.error("Validation errors:", errors);
+              const firstError = Object.keys(errors)[0] as keyof typeof errors;
+              if (firstError && errors[firstError]) {
+                toast.error(errors[firstError]?.message || "Validation failed");
+              } else {
+                toast.error("Please fill in all required fields");
+              }
+            })}
+          >
             <Tabs
               value={currentTab}
               onValueChange={(value: string) => {
