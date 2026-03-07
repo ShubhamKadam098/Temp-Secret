@@ -45,6 +45,8 @@ const SecretsPage = ({ params }: { params: { id: string } }) => {
           } else if (status === 404) {
             setIsMessageAvailable(false);
             toast.error("Message not found");
+          } else if (status === 429) {
+            toast.error("Too many requests. Please wait a moment and try again.");
           } else {
             toast.error("An error occurred while retrieving the message");
           }

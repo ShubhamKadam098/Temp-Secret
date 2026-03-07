@@ -1,10 +1,28 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import {
   FetchSecretRequest,
   FetchSecretResponse,
   CreateSecretRequest,
   CreateSecretResponse,
+  ApiError,
 } from "@/types/api";
+
+export const isRateLimitError = (error: unknown): boolean => {
+  if (error instanceof AxiosError) {
+    return error.response?.status === 429;
+  }
+  return false;
+};
+
+export const getErrorMessage = (error: unknown): string => {
+  if (error instanceof AxiosError) {
+    if (error.response?.status === 429) {
+      return "Too many requests. Please try again later.";
+    }
+    return error.response?.data?.message || "An error occurred";
+  }
+  return "An unexpected error occurred";
+};
 
 export const fetchSecret = async ({
   id,

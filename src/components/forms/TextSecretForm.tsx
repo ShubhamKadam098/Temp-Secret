@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2 } from "lucide-react";
-import { createSecretText } from "@/lib/api/secret";
+import { createSecretText, getErrorMessage, isRateLimitError } from "@/lib/api/secret";
 import { textSecretSchema, TextSecretFormData } from "@/types/schemas";
 import toast from "react-hot-toast";
 
@@ -42,8 +42,11 @@ export function TextSecretForm({ onSuccess }: TextSecretFormProps) {
       } else {
         toast.error("Error while creating link");
       }
-    } catch {
-      toast.error("Error while creating link");
+    } catch (error) {
+      const message = isRateLimitError(error)
+        ? "Too many requests. Please wait a moment and try again."
+        : getErrorMessage(error);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
