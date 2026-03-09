@@ -4,8 +4,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DisplayLink from "@/components/DisplayLink";
 import { TextSecretForm, LinkSecretForm, FileSecretForm } from "@/components/forms";
 
-const HomePage = () => {
+import { parseAsStringLiteral, useQueryState } from "nuqs";
+const secretModeValues = ["text", "file", "link"] as const;
+type SecretMode = (typeof secretModeValues)[number];
+
+const isSecretMode = (value: string): value is SecretMode =>
+  secretModeValues.includes(value as SecretMode);
+
+const HomePageContent = () => {
   const [returnedLink, setReturnedLink] = useState("");
+      const [activeTab, setActiveTab] = useQueryState(
+    "tab",
+    parseAsStringLiteral(secretModeValues).withDefault("text")
+  );
 
   return (
     <section className="flex max-w-full flex-col gap-10 text-primary">
@@ -19,8 +30,13 @@ const HomePage = () => {
         />
       ) : (
         <Tabs
-          defaultValue="text"
-          className="max-w-[700px] w-full h-fit min-w-fit bg-background border border-border rounded-lg mx-auto mt-10 md:px-6"
+              value={activeTab}
+              onValueChange={(value) => {
+                if (isSecretMode(value)) {
+                  setActiveTab(value);
+                }
+              }}
+              className="surface-card rounded-[20px] p-4 sm:p-5"
         >
           <TabsList className="flex gap-7 bg-transparent h-14 p-2">
             <TabsTrigger value="text">Text</TabsTrigger>
@@ -46,5 +62,11 @@ const HomePage = () => {
     </section>
   );
 };
+
+const HomePage = () => (
+  <Suspense fallback={null}>
+    <HomePageContent />
+  </Suspense>
+);
 
 export default HomePage;
