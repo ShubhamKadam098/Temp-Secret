@@ -3,10 +3,9 @@
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
+import { Button, LoadingButton } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, X } from "lucide-react";
+import { Eye, EyeOff, FileText, Upload, X } from "lucide-react";
 import { createSecretFile, getErrorMessage, isRateLimitError } from "@/lib/api/secret";
 import { fileSecretSchema, FileSecretFormData } from "@/types/schemas";
 import toast from "react-hot-toast";
@@ -82,76 +81,114 @@ export function FileSecretForm({ onSuccess }: FileSecretFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="space-y-2">
-        <label className="text-sm font-semibold">File</label>
-        <div className="flex items-center justify-between gap-2">
+      <div className="space-y-2.5">
+        <label htmlFor="secret-file" className="text-sm font-medium text-foreground">
+          File
+        </label>
+        <div className="rounded-xl border border-dashed border-white/15 bg-black/20 p-3.5">
           <input
+            id="secret-file"
             type="file"
             accept=".png, .jpg, .jpeg, .pdf"
             disabled={isLoading}
             ref={fileInputRef}
             onChange={(e) => {
               if (e.target.files?.[0]) {
-                setValue("file", e.target.files[0]);
+                setValue("file", e.target.files[0], { shouldValidate: true });
               }
             }}
-            className="block w-full text-sm text-primary file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:bg-secondary hover:file:bg-secondary-hover border border-border rounded-lg file:rounded-lg file:font-semibold"
+            className="sr-only"
           />
-          {selectedFile && (
-            <X
-              className="cursor-pointer rounded-full transition-all ease-in-out hover:bg-secondary-hover flex-shrink-0"
-              onClick={() => {
-                setValue("file", undefined as any);
-                if (fileInputRef.current) {
-                  fileInputRef.current.value = "";
-                }
-              }}
-            />
-          )}
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-start gap-3">
+              <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.05]">
+                <FileText aria-hidden="true" className="h-4 w-4 text-foreground" />
+              </div>
+              <div className="min-w-0 space-y-1">
+                <p className="truncate text-sm font-medium text-foreground">
+                  {selectedFile ? selectedFile.name : "Choose a file to share"}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {selectedFile
+                    ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB`
+                    : "PNG, JPG, JPEG, or PDF. Maximum size 5 MB."}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 sm:shrink-0">
+              <Button
+                type="button"
+                variant={selectedFile ? "ghost" : "outline"}
+                className="w-full sm:w-auto"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isLoading}
+              >
+                <Upload aria-hidden="true" className="mr-2 h-4 w-4" />
+                {selectedFile ? "Replace" : "Select"}
+              </Button>
+              {selectedFile && (
+                <button
+                  type="button"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground"
+                  onClick={() => {
+                    setValue("file", undefined as never, { shouldValidate: true });
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = "";
+                    }
+                  }}
+                  aria-label="Remove selected file"
+                >
+                  <X aria-hidden="true" className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          </div>
+
         </div>
         {errors.file && (
           <p className="text-sm text-destructive">{errors.file.message}</p>
         )}
-        <p className="text-sm text-muted-foreground">
-          Supports: .png, .jpg, .jpeg, .pdf (Max 5MB)
-        </p>
       </div>
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Password (optional)</label>
-        <Input
-          {...register("password")}
-          type={isShowPassword ? "text" : "password"}
-          placeholder="********"
-          disabled={isLoading}
-        />
+      <div className="space-y-2.5">
+        <label htmlFor="file-password" className="text-sm font-medium text-foreground">
+          Password
+          <span className="ml-2 text-muted-foreground">(optional)</span>
+        </label>
+        <div className="relative">
+          <Input
+            id="file-password"
+            {...register("password")}
+            type={isShowPassword ? "text" : "password"}
+            placeholder="Add a password for an extra check…"
+            disabled={isLoading}
+            autoComplete="new-password"
+            className="pr-14"
+          />
+          <button
+            type="button"
+            className="absolute right-3 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={() => setIsShowPassword(!isShowPassword)}
+            disabled={isLoading}
+            aria-label={isShowPassword ? "Hide password" : "Show password"}
+          >
+            {isShowPassword ? (
+              <EyeOff aria-hidden="true" className="h-4 w-4" />
+            ) : (
+              <Eye aria-hidden="true" className="h-4 w-4" />
+            )}
+          </button>
+        </div>
         {errors.password && (
           <p className="text-sm text-destructive">{errors.password.message}</p>
         )}
       </div>
 
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id="showPasswordFile"
-          checked={isShowPassword}
-          disabled={isLoading}
-          onCheckedChange={() => setIsShowPassword(!isShowPassword)}
-        />
-        <label htmlFor="showPasswordFile" className="text-sm font-medium">
-          Show password
-        </label>
-      </div>
-
-      <Button type="submit" disabled={isLoading} className="w-full">
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Uploading...
-          </>
-        ) : (
-          "Create Secret"
-        )}
-      </Button>
+      <LoadingButton type="submit" isLoading={isLoading} className="w-full" size="lg">
+        Create File Link
+      </LoadingButton>
     </form>
   );
 }

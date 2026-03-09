@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { Clipboard, Download } from "lucide-react";
+import { Clipboard, Download, FileCheck2 } from "lucide-react";
 import { saveAs } from "file-saver";
 
 const ShowMessage = ({
@@ -58,37 +58,47 @@ const ShowMessage = ({
   };
 
   return (
-    <div className="flex flex-wrap flex-col gap-8 border border-border rounded-lg bg-card px-4 py-8 w-full">
-      <h1 className="border-b border-border pb-2 font-semibold text-base">
-        Your Secret
-      </h1>
-      {inputType == "file" ? (
-        ""
+    <div className="surface-card flex w-full flex-col gap-5 rounded-[24px] p-5 sm:p-6">
+      <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/[0.06]">
+          <FileCheck2 className="h-5 w-5 text-foreground" />
+        </div>
+        <div>
+          <h1 className="font-semibold text-foreground">Your Secret</h1>
+          <p className="text-sm text-muted-foreground">
+            This content is available for this session only.
+          </p>
+        </div>
+      </div>
+      {inputType === "file" ? (
+        null
       ) : (
-        <p className="break-words min-w-full">{message}</p>
+        <p className="min-w-full break-words rounded-2xl border border-white/10 bg-black/20 p-4 text-sm leading-7 text-foreground">
+          {message}
+        </p>
       )}
 
       <div className="flex justify-center">
         {inputType === "file" ? (
           <Button
             variant="default"
-            className="w-fit flex items-center justify-center gap-2"
+            className="w-full justify-center gap-2 sm:w-auto"
             onClick={downloadFile}
           >
-            <Download width={"15px"} height={"15px"} />
+            <Download aria-hidden="true" className="h-4 w-4" />
             Download
           </Button>
         ) : (
           <>
             <Button
               variant="default"
-              className="mx-auto flex items-center gap-2 w-fit"
+              className="mx-auto w-full gap-2 sm:w-auto"
               onClick={() => {
                 navigator.clipboard.writeText(message);
                 toast.success("Copied to clipboard");
               }}
             >
-              <Clipboard width={20} height={20} className="hidden md:block" />
+              <Clipboard aria-hidden="true" className="hidden h-4 w-4 md:block" />
               Copy
             </Button>
           </>

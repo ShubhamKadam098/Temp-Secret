@@ -1,19 +1,19 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Link } from "lucide-react";
+import { Copy } from "lucide-react";
 import toast from "react-hot-toast";
 
 const CopyBtn = ({ inputText }: { inputText: string }) => {
   return (
     <Button
       variant={"secondary"}
-      className="w-fit flex items-center gap-2"
+      className="w-full gap-2 sm:w-auto"
       onClick={() => {
         toast.success("Link copied to clipboard");
         navigator.clipboard.writeText(inputText);
       }}
     >
-      <Link width={"15px"} height={"15px"} />
+      <Copy aria-hidden="true" className="h-4 w-4" />
       Copy Link
     </Button>
   );

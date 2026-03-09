@@ -7,7 +7,7 @@ import { QueryProvider } from "@/components/providers/QueryProvider";
 
 export const metadata: Metadata = {
   title: "Temp Secrets",
-  description: "A simple app to store your secrets",
+  description: "Share text, files, and redirects with one-time secret links.",
 };
 
 export default function RootLayout({
@@ -27,9 +27,20 @@ export default function RootLayout({
           Skip to content
         </a>
         <NuqsAdapter>
-        <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>{children}</QueryProvider>
         </NuqsAdapter>
-
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              background: "rgba(15, 23, 42, 0.95)",
+              color: "#f8fafc",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: "18px",
+              boxShadow: "0 20px 50px -30px rgba(15, 23, 42, 0.9)",
+            },
+          }}
+        />
       </body>
     </html>
   );

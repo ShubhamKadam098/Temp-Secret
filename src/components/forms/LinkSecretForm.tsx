@@ -3,10 +3,9 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { createSecretLink, getErrorMessage, isRateLimitError } from "@/lib/api/secret";
 import { linkSecretSchema, LinkSecretFormData } from "@/types/schemas";
 import toast from "react-hot-toast";
@@ -60,54 +59,60 @@ export function LinkSecretForm({ onSuccess }: LinkSecretFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="space-y-2">
-        <label className="text-sm font-semibold">Redirect URL</label>
+      <div className="space-y-2.5">
+        <label htmlFor="secret-link" className="text-sm font-medium text-foreground">
+          Redirect URL
+        </label>
         <Input
+          id="secret-link"
           {...register("link")}
           type="url"
-          placeholder="https://example.com"
+          placeholder="https://example.com/private-preview…"
           disabled={isLoading}
+          autoComplete="off"
         />
         {errors.link && (
           <p className="text-sm text-destructive">{errors.link.message}</p>
         )}
       </div>
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Password (optional)</label>
-        <Input
-          {...register("password")}
-          type={isShowPassword ? "text" : "password"}
-          placeholder="********"
-          disabled={isLoading}
-        />
+      <div className="space-y-2.5">
+        <label htmlFor="link-password" className="text-sm font-medium text-foreground">
+          Password
+          <span className="ml-2 text-muted-foreground">(optional)</span>
+        </label>
+        <div className="relative">
+          <Input
+            id="link-password"
+            {...register("password")}
+            type={isShowPassword ? "text" : "password"}
+            placeholder="Add a password for an extra check…"
+            disabled={isLoading}
+            autoComplete="new-password"
+            className="pr-14"
+          />
+          <button
+            type="button"
+            className="absolute right-3 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={() => setIsShowPassword(!isShowPassword)}
+            disabled={isLoading}
+            aria-label={isShowPassword ? "Hide password" : "Show password"}
+          >
+            {isShowPassword ? (
+              <EyeOff aria-hidden="true" className="h-4 w-4" />
+            ) : (
+              <Eye aria-hidden="true" className="h-4 w-4" />
+            )}
+          </button>
+        </div>
         {errors.password && (
           <p className="text-sm text-destructive">{errors.password.message}</p>
         )}
       </div>
 
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id="showPasswordLink"
-          checked={isShowPassword}
-          disabled={isLoading}
-          onCheckedChange={() => setIsShowPassword(!isShowPassword)}
-        />
-        <label htmlFor="showPasswordLink" className="text-sm font-medium">
-          Show password
-        </label>
-      </div>
-
-      <Button type="submit" disabled={isLoading} className="w-full">
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Creating...
-          </>
-        ) : (
-          "Create Secret"
-        )}
-      </Button>
+      <LoadingButton type="submit" isLoading={isLoading} className="w-full" size="lg">
+        Create Redirect Link
+      </LoadingButton>
     </form>
   );
 }

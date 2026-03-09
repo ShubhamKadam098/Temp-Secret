@@ -13,10 +13,13 @@ export const metadata: Metadata = {
 
 const HomeLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <main className="relative flex flex-col min-h-screen max-w-screen">
+    <main className="relative flex min-h-screen flex-col">
       <Navbar />
-      <section className="flex flex-col px-6 pb-6 pt-28 max-md:pb-14 sm:px-14 flex-1">
-        <div className="max-w-full">{children}</div>
+      <section
+        id="main-content"
+        className="relative flex flex-1 flex-col px-4 pb-8 pt-24 sm:px-6 sm:pb-10 sm:pt-28 lg:px-10"
+      >
+        <div className="relative mx-auto w-full max-w-7xl flex-1">{children}</div>
       </section>
       <Footer />
     </main>
