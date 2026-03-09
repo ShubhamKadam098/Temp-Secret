@@ -5,14 +5,30 @@ import bcrypt from "bcryptjs";
 import DecryptData from "@/lib/DecryptData";
 import DeleteStorageFolder from "@/lib/supabase/DeleteStorageFolder";
 import { NextRequest, NextResponse } from "next/server";
-import { secretViewRateLimit } from "@/lib/rateLimit";
+import {
+  consumeRateLimit,
+  isRateLimitExceeded,
+  secretViewRateLimit,
+} from "@/lib/rateLimit";
 
 export const POST = async (request: NextRequest) => {
   try {
-    const ip = request.headers.get("x-forwarded-for") || "anonymous";
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "anonymous";
+
     try {
-      await secretViewRateLimit.consume(ip);
-    } catch {
+      await consumeRateLimit(secretViewRateLimit, ip);
+    } catch (error) {
+      if (!isRateLimitExceeded(error)) {
+        console.error("Rate limiter unavailable during secret fetch:", error);
+        return NextResponse.json(
+          { success: false, message: "Service temporarily unavailable" },
+          { status: 503 }
+        );
+      }
+
       return NextResponse.json(
         { success: false, message: "Too many requests. Please try again later." },
         { status: 429 }

@@ -7,7 +7,11 @@ import EncryptData from "@/lib/EncryptData";
 import generateRandomId from "@/lib/GenerateRandomId";
 import { AddFileToStorage } from "@/lib/supabase/AddFileToStorage";
 import { env } from "@/env";
-import { publicRateLimit } from "@/lib/rateLimit";
+import {
+  consumeRateLimit,
+  isRateLimitExceeded,
+  publicRateLimit,
+} from "@/lib/rateLimit";
 
 const MAX_FILE_SIZE_MB = 2;
 const ALLOWED_MIME_TYPES = [
@@ -19,10 +23,22 @@ const ALLOWED_MIME_TYPES = [
 
 export const POST = async (request: NextRequest) => {
   try {
-    const ip = request.headers.get("x-forwarded-for") || "anonymous";
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "anonymous";
+
     try {
-      await publicRateLimit.consume(ip);
-    } catch {
+      await consumeRateLimit(publicRateLimit, ip);
+    } catch (error) {
+      if (!isRateLimitExceeded(error)) {
+        console.error("Rate limiter unavailable during secret creation:", error);
+        return NextResponse.json(
+          { success: false, message: "Service temporarily unavailable" },
+          { status: 503 }
+        );
+      }
+
       return NextResponse.json(
         { success: false, message: "Too many requests. Please try again later." },
         { status: 429 }
