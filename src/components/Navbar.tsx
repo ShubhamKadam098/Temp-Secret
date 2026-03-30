@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 
 const Navbar = () => {
   return (
@@ -31,10 +30,15 @@ const Navbar = () => {
             href="https://github.com/ShubhamKadam098"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-sm font-medium text-foreground transition-[background-color,border-color] hover:bg-white/[0.06] sm:px-4"
+            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-sm font-medium text-foreground transition-[background-color,border-color] hover:bg-white/[0.06]"
           >
+            <Image
+              src="/icons/github-Icon.svg"
+              width={18}
+              height={18}
+              alt="GitHub"
+            />
             GitHub
-            <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
           </Link>
         </div>
       </nav>
