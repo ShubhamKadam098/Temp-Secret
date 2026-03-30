@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, FileText, Upload, X } from "lucide-react";
 import { createSecretFile, getErrorMessage, isRateLimitError } from "@/lib/api/secret";
 import { fileSecretSchema, FileSecretFormData } from "@/types/schemas";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 const MAX_FILE_SIZE_MB = 5;
 const ALLOWED_FILE_TYPES = [

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { GeistSans } from "geist/font/sans";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 
 export const metadata: Metadata = {
@@ -29,18 +29,7 @@ export default function RootLayout({
         <NuqsAdapter>
           <QueryProvider>{children}</QueryProvider>
         </NuqsAdapter>
-        <Toaster
-          position="bottom-right"
-          toastOptions={{
-            style: {
-              background: "rgba(15, 23, 42, 0.95)",
-              color: "#f8fafc",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: "18px",
-              boxShadow: "0 20px 50px -30px rgba(15, 23, 42, 0.9)",
-            },
-          }}
-        />
+        <Toaster position="bottom-right" theme="dark" />
       </body>
     </html>
   );

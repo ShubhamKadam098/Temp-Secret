@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, KeyRound, Loader2, Unlock } from "lucide-react";
 import { useFetchSecret } from "@/hooks/useSecret";
 import { AxiosError } from "axios";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Form, FormField, FormControl, FormMessage } from "@/components/ui/form";
 import { fetchSecretSchema, FetchSecretFormData } from "@/types/schemas";

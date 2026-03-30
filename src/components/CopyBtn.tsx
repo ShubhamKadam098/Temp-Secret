@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Copy } from "lucide-react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 const CopyBtn = ({ inputText }: { inputText: string }) => {
   return (

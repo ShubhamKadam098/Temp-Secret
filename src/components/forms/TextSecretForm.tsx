@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import { createSecretText, getErrorMessage, isRateLimitError } from "@/lib/api/secret";
 import { textSecretSchema, TextSecretFormData } from "@/types/schemas";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 interface TextSecretFormProps {
   onSuccess: (link: string) => void;

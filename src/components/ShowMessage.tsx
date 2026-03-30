@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { Clipboard, Download, FileCheck2 } from "lucide-react";
 import { saveAs } from "file-saver";
 
