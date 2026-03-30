@@ -1,6 +1,12 @@
-import { supabase } from "@/Supabase/config";
+import { SupabaseClient } from "@supabase/supabase-js";
 
-const DeleteDoc = async ({ docId }: { docId: string }) => {
+const DeleteDoc = async ({
+  supabase,
+  docId,
+}: {
+  supabase: SupabaseClient;
+  docId: string;
+}) => {
   try {
     const { error } = await supabase
       .from("secrets")

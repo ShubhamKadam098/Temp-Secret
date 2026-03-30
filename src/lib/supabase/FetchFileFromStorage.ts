@@ -1,4 +1,4 @@
-import { supabase } from "@/Supabase/config";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 interface FetchFileResponse {
   success: boolean;
@@ -9,8 +9,10 @@ interface FetchFileResponse {
 }
 
 export const FetchFileFromStorage = async ({
+  supabase,
   filePath,
 }: {
+  supabase: SupabaseClient;
   filePath: string;
 }): Promise<FetchFileResponse> => {
   try {
@@ -24,10 +26,8 @@ export const FetchFileFromStorage = async ({
       throw new Error("No data received from storage");
     }
 
-    // Extract file name from path
     const fileName = filePath.split("/").pop() || "file";
 
-    // Determine content type based on file extension
     const ext = fileName.split(".").pop()?.toLowerCase();
     const contentTypeMap: Record<string, string> = {
       jpg: "image/jpeg",
@@ -38,7 +38,6 @@ export const FetchFileFromStorage = async ({
     };
     const contentType = contentTypeMap[ext || ""] || "application/octet-stream";
 
-    // Convert to base64 using Node.js Buffer (works in server-side)
     const arrayBuffer = await data.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const base64 = buffer.toString("base64");

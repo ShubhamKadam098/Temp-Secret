@@ -10,6 +10,7 @@ import {
   isRateLimitExceeded,
   secretViewRateLimit,
 } from "@/lib/rateLimit";
+import { serverSupabase } from "@/Supabase/serverClient";
 
 export const POST = async (request: NextRequest) => {
   try {
@@ -44,7 +45,7 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    const message = await FetchDoc({ docId: id });
+    const message = await FetchDoc({ supabase: serverSupabase, docId: id });
     if (!message) {
       return NextResponse.json(
         { success: false, message: "Message not found" },
@@ -71,6 +72,7 @@ export const POST = async (request: NextRequest) => {
 
     if (message.inputType === "file" && message.filePath) {
       const fileResult = await FetchFileFromStorage({
+        supabase: serverSupabase,
         filePath: message.filePath,
       });
 
@@ -81,8 +83,8 @@ export const POST = async (request: NextRequest) => {
         );
       }
 
-      await DeleteStorageFolder(id);
-      await DeleteDoc({ docId: id });
+      await DeleteStorageFolder({ supabase: serverSupabase, id });
+      await DeleteDoc({ supabase: serverSupabase, docId: id });
 
       return NextResponse.json(
         {
@@ -108,7 +110,7 @@ export const POST = async (request: NextRequest) => {
       input: message.encryptedContent,
     });
 
-    await DeleteDoc({ docId: id });
+    await DeleteDoc({ supabase: serverSupabase, docId: id });
 
     return NextResponse.json(
       {

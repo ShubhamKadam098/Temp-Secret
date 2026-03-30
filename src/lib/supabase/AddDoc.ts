@@ -1,10 +1,12 @@
-import { supabase } from "@/Supabase/config";
 import { AddSecretPayload } from "@/types/api";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 const AddDoc = async ({
+  supabase,
   id,
   payLoad,
 }: {
+  supabase: SupabaseClient;
   id: string;
   payLoad: AddSecretPayload;
 }) => {

@@ -1,6 +1,12 @@
-import { supabase } from "@/Supabase/config";
+import { SupabaseClient } from "@supabase/supabase-js";
 
-const DeleteStorageFolder = async (id: string): Promise<void> => {
+const DeleteStorageFolder = async ({
+  supabase,
+  id,
+}: {
+  supabase: SupabaseClient;
+  id: string;
+}): Promise<void> => {
   try {
     const { data, error } = await supabase.storage
       .from("files")

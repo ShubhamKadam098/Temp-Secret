@@ -12,6 +12,7 @@ import {
   isRateLimitExceeded,
   publicRateLimit,
 } from "@/lib/rateLimit";
+import { serverSupabase } from "@/Supabase/serverClient";
 
 const MAX_FILE_SIZE_MB = 2;
 const ALLOWED_MIME_TYPES = [
@@ -98,7 +99,7 @@ export const POST = async (request: NextRequest) => {
         );
       }
 
-      const uploadResponse = await AddFileToStorage({ input, id });
+      const uploadResponse = await AddFileToStorage({ supabase: serverSupabase, input, id });
       if (!uploadResponse.success || !uploadResponse.filePath) {
         return NextResponse.json(
           { success: false, message: "Error while uploading file" },
@@ -132,7 +133,7 @@ export const POST = async (request: NextRequest) => {
       password: password || undefined,
     };
 
-    const response = await AddDoc({ id, payLoad });
+    const response = await AddDoc({ supabase: serverSupabase, id, payLoad });
     if (!response) {
       throw new Error("Error while creating link");
     }

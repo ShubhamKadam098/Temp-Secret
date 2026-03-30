@@ -1,4 +1,4 @@
-import { supabase } from "@/Supabase/config";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 interface UploadResponse {
   success: boolean;
@@ -14,9 +14,11 @@ const sanitizeFileName = (name: string): string => {
 };
 
 export const AddFileToStorage = async ({
+  supabase,
   input,
   id,
 }: {
+  supabase: SupabaseClient;
   input: File;
   id: string;
 }): Promise<UploadResponse> => {

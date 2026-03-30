@@ -1,7 +1,13 @@
-import { supabase } from "@/Supabase/config";
 import { Secret } from "@/types/api";
+import { SupabaseClient } from "@supabase/supabase-js";
 
-const FetchDoc = async ({ docId }: { docId: string }): Promise<Secret | null> => {
+const FetchDoc = async ({
+  supabase,
+  docId,
+}: {
+  supabase: SupabaseClient;
+  docId: string;
+}): Promise<Secret | null> => {
   try {
     const { data, error } = await supabase
       .from("secrets")
